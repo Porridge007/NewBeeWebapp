@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="utf-8">
+<head>
+  <meta charset="utf-8">
+  <script type="text/javascript" src='javascripts/jquery.js'></script>
+  <title></title>
+</head>
+<body>
+123111
+</body>
+
+<script type="text/javascript">
+  $.ajax({
+    type: 'post',
+    url: '/update',
+    data: {
+      name: 'example0',
+      ip: '1.1.1.1',
+      stat: 'on'
+    },
+    success:function (result) {
+      console.log(result);
+    }
+  });
+</script>
+</html>
