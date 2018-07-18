@@ -1,0 +1,159 @@
+﻿
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit|ie-comp|ie-stand">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<link rel="Bookmark" href="favicon.ico" >
+
+<!--[if lt IE 9]>
+<script type="text/javascript" src="lib/html5.js"></script>
+<script type="text/javascript" src="lib/respond.min.js"></script>
+<![endif]-->
+<link rel="stylesheet" type="text/css" href="static/h-ui/css/H-ui.min.css" />
+<link rel="stylesheet" type="text/css" href="static/h-ui.admin/css/H-ui.admin.css" />
+<link rel="stylesheet" type="text/css" href="lib/Hui-iconfont/1.0.8/iconfont.css" />
+<link rel="stylesheet" type="text/css" href="static/h-ui.admin/skin/default/skin.css" id="skin" />
+<link rel="stylesheet" type="text/css" href="static/h-ui.admin/css/style.css" />
+<!--[if IE 6]>
+<script type="text/javascript" src="http://lib.h-ui.net/DD_belatedPNG_0.0.8a-min.js" ></script>
+<script>DD_belatedPNG.fix('*');</script><![endif]-->
+
+
+<title>共享目录</title>
+
+</head>
+<body>
+
+
+<section class="Hui-article-box" style="left:100px;right:100px;top:0px">
+	
+	<div class="Hui-article" style="top:0px">
+		<article class="cl pd-20">
+			
+			<div class="cl pd-5 bg-1 bk-gray mt-20">
+				<span class="l">
+				
+				<a class="btn btn-primary radius" data-title="添加目录"  onclick="direct_add()" ><i class="Hui-iconfont">&#xe600;</i> 添加目录</a>
+				</span>
+				
+			</div>
+			<div class="mt-20">
+				<table class="table table-border table-bordered table-bg table-hover table-sort">
+					<thead>
+						<tr class="text-c">
+							
+							<th>目录名</th>
+							<th>访问IP</th>
+							<th>目录状态</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody id="data-body">
+						
+					</tbody>
+				</table>
+			</div>
+		</article>
+	</div>
+</section>
+
+
+<script type="text/javascript" src="lib/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="lib/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="static/h-ui/js/H-ui.js"></script>
+<script type="text/javascript" src="static/h-ui.admin/js/H-ui.admin.page.js"></script>
+
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="lib/laypage/1.2/laypage.js"></script>
+<script type="text/javascript">
+$(function(){
+	$.ajax({
+			url:'http://10.167.226.121:3000/show',
+			type:'GET',
+			dataType:'json',
+			success:function(data){
+				var html = "";
+				$.each(data,function(i,e){
+				html += "<tr>";
+                html +=     '<td class="text-c">' + e.name + "</td>"
+                html +=     '<td class="text-c">' + e.ip + "</td>"
+				if(e.stat == "on"){
+					html += '<td class="text-c"><span class="label label-success radius">' + e.stat + "</span></td>";
+				}else{
+					html += '<td class="text-c"><span class="label label-danger radius">' + e.stat + "</span></td>";
+				}
+				var name="'"+e.name+"'";
+				var ip="'"+e.ip+"'";
+				html += '<td class="text-c">';
+				
+				html += '<a style="text-decoration:none" class="ml-5" onClick="direct_edit('+name+','+ip+')" title="编辑"><i class="Hui-iconfont">&#xe6df;</i></a>';
+				
+				if(e.stat == "on"){
+                html += '<a style="text-decoration:none" class="ml-5" onClick="direct_del(this, '+name+')" title="删除"><i class="Hui-iconfont">&#xe6e2;</i></a></td>'; 
+				}
+                html += "</tr>";
+			
+				});
+				$("#data-body").html(html);
+			}		
+		});
+});
+	
+
+/*direct-添加*/
+function direct_add(){
+	$.get("http://10.167.226.121:3000/create", function(result){
+		if(result=='success'){
+			layer.msg("创建成功！");
+			setTimeout(function(){window.location.reload()},1000);
+		}else{
+			
+			layer.msg("创建失败!");
+		}
+	});
+}
+/*direct-编辑*/
+function direct_edit(name,ip){
+	var index = layer.open({
+		type: 2,
+		title: "编辑",
+		content: 'directory-add.html?name='+name+'&ip='+ip,
+		area: ['420px', '300px'],
+	});
+}
+/*direct-删除*/
+function direct_del(obj, direct_name){
+	layer.confirm('确认要删除吗？',function(index){
+		$.ajax({
+			type: 'POST',
+			url: 'http://10.167.226.121:3000/delete?name='+direct_name,
+			//dataType: 'json',
+			//data:{name:direct_name},
+			success: function(data){
+				if(data=='success'){
+					$(obj).parents("tr").remove();
+					layer.msg('已删除!',{icon:1,time:1000});
+				}else{
+					layer.msg("删除失败！");
+				}
+				
+			},
+			error:function(data){
+				if(data=='success'){
+					$(obj).parents("tr").remove();
+					layer.msg('已删除!',{icon:1,time:1000});
+				}else{
+					layer.msg("删除失败！");
+				}
+			}
+		});		
+	});
+}
+</script>
+<!--/请在上方写此页面业务相关的脚本-->
+</body>
+</html>
